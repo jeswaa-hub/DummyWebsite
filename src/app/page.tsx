@@ -94,7 +94,7 @@ export default function Home() {
                   className="object-contain"
                 />
                 {/* Trust Indicators Bar - Overlapping */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 glass soft-shadow rounded-2xl px-8 py-6 flex gap-12 items-center w-full max-w-md animate-fade-in-up delay-800">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 glass soft-shadow rounded-2xl px-8 py-6 flex gap-12 items-center w-full  animate-fade-in-up delay-800">
                   <div className="text-center">
                     <div className="text-3xl font-bold" style={{ color: COLORS.charcoal }}>17.5%</div>
                     <div className="text-sm font-semibold" style={{ color: COLORS.slate }}>Typical ROI</div>
