@@ -1,17 +1,50 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 const COLORS = {
-  primaryBg: "#F8FAFC",      // 60% Pearl White
-  charcoal: "#1E293B",       // 30% Deep Charcoal
-  silver: "#CBD5E1",         // 10% Metallic Silver
-  slate: "#475569",          // Slate for text
-  lightSlate: "#94A3B8",     // Light slate
+  primaryBg: "#FFFFFF",      // Pure White
+  charcoal: "#111827",      // Deep Matte Black
+  silver: "#9CA3AF",       // Silver
+  slate: "#6B7280",        // Slate for text
+  lightSlate: "#9CA3AF",   // Light slate
   white: "#FFFFFF",
 };
 
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+      observerRef.current?.observe(el);
+    });
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
   return (
     <div className="w-full font-sans" style={{ backgroundColor: COLORS.primaryBg }}>
       {/* Header - Glassmorphism */}
@@ -20,6 +53,8 @@ export default function Home() {
           <div className="text-2xl font-bold animate-slide-left" style={{ color: COLORS.charcoal, fontFamily: "Inter, sans-serif" }}>
             MIOYM
           </div>
+          
+          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-8 items-center text-sm font-medium" style={{ color: COLORS.charcoal }}>
             {['Home', 'The Firm', 'Solutions', 'Asset Management', 'Lending', 'News'].map((item, i) => (
               <a key={item} href="#" className={`hover:text-slate-500 transition-colors duration-300 animate-fade-in`} style={{ animationDelay: `${i * 50}ms` }}>
@@ -27,10 +62,43 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <button className="text-white px-6 py-2.5 rounded-full font-medium transition-all duration-300 hover:opacity-90 hover:shadow-lg animate-slide-right" style={{ backgroundColor: COLORS.charcoal }}>
+
+          {/* Desktop CTA */}
+          <button className="hidden md:block text-white px-6 py-2.5 rounded-full font-medium transition-all duration-300 hover:opacity-90 hover:shadow-lg animate-slide-right" style={{ backgroundColor: COLORS.charcoal }}>
             Investor Portal
           </button>
+
+          {/* Mobile Hamburger */}
+          <button 
+            className="md:hidden p-2" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg py-4 px-6 mt-4">
+            <nav className="flex flex-col gap-4 text-sm font-medium" style={{ color: COLORS.charcoal }}>
+              {['Home', 'The Firm', 'Solutions', 'Asset Management', 'Lending', 'News'].map((item) => (
+                <a key={item} href="#" className="hover:text-slate-500 transition-colors duration-300">
+                  {item}
+                </a>
+              ))}
+              <button className="text-white px-6 py-2.5 rounded-full font-medium mt-2" style={{ backgroundColor: COLORS.charcoal }}>
+                Investor Portal
+              </button>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -39,7 +107,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-in-up" style={{ color: COLORS.charcoal, fontFamily: "Inter, sans-serif" }}>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-in-up" style={{ color: COLORS.charcoal, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Scale Your Wealth. Restore Communities.
               </h1>
               <p className="text-xl max-w-xl animate-fade-in-up delay-200" style={{ color: COLORS.slate }}>
@@ -85,16 +153,16 @@ export default function Home() {
             </div>
 
             {/* Right Side - Image + Trust Indicators */}
-            <div className="relative flex items-center justify-center">
-              <div className="relative w-full max-w-lg aspect-square animate-motion-blur">
+            <div className="flex flex-col items-center justify-center gap-6">
+              <div className="relative w-full max-w-lg aspect-square">
                 <Image
                   src="/hand.png"
                   alt="Premium Property"
                   fill
                   className="object-contain"
                 />
-                {/* Trust Indicators Bar - Overlapping */}
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 glass soft-shadow rounded-2xl px-8 py-6 flex gap-12 items-center w-full  animate-fade-in-up delay-800">
+                {/* Trust Indicators Bar - Below Image */}
+                <div className="glass soft-shadow rounded-2xl px-8 py-6 flex gap-12 items-center w-full max-w-lg animate-fade-in-up delay-800">
                   <div className="text-center">
                     <div className="text-3xl font-bold" style={{ color: COLORS.charcoal }}>17.5%</div>
                     <div className="text-sm font-semibold" style={{ color: COLORS.slate }}>Typical ROI</div>
@@ -117,10 +185,10 @@ export default function Home() {
       </section>
 
       {/* Core Pillars Section */}
-      <section className="py-24" style={{ backgroundColor: COLORS.primaryBg }}>
+      <section className="py-24 animate-on-scroll" style={{ backgroundColor: COLORS.primaryBg }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 animate-fade-in-up" style={{ color: COLORS.charcoal, fontFamily: "Inter, sans-serif" }}>
+            <h2 className="text-4xl font-bold mb-4" style={{ color: COLORS.charcoal, fontFamily: "Inter, sans-serif" }}>
               How Can We Help You Today?
             </h2>
             <p className="text-xl max-w-2xl mx-auto animate-fade-in-up delay-200" style={{ color: COLORS.slate }}>
@@ -181,7 +249,7 @@ export default function Home() {
       </section>
 
       {/* Featured Properties Section */}
-      <section className="py-24" style={{ backgroundColor: COLORS.primaryBg }}>
+      <section className="py-24 animate-on-scroll" style={{ backgroundColor: COLORS.primaryBg }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             {/* Left - Text Content */}
@@ -239,7 +307,7 @@ export default function Home() {
       </section>
 
       {/* Workflow Section - Horizontal Timeline */}
-      <section className="py-24" style={{ backgroundColor: COLORS.primaryBg }}>
+      <section className="py-24 animate-on-scroll" style={{ backgroundColor: COLORS.primaryBg }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 animate-fade-in-up" style={{ color: COLORS.charcoal, fontFamily: "Inter, sans-serif" }}>
@@ -276,7 +344,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20" style={{ backgroundColor: COLORS.charcoal }}>
+      <section className="py-20 animate-on-scroll" style={{ backgroundColor: COLORS.charcoal }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 items-center">
             {/* Left - Text */}
@@ -307,7 +375,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24" style={{ backgroundColor: COLORS.primaryBg }}>
+      <section className="py-24 animate-on-scroll" style={{ backgroundColor: COLORS.primaryBg }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-2xl font-semibold mb-2 animate-fade-in" style={{ color: COLORS.slate }}>Testimonials</h2>
@@ -346,7 +414,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section - Charcoal with Silver accents */}
-      <section className="py-24" style={{ backgroundColor: COLORS.charcoal }}>
+      <section className="py-24 animate-on-scroll" style={{ backgroundColor: COLORS.charcoal }}>
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="animate-slide-left" style={{ color: COLORS.white }}>
             <h2 className="text-4xl font-bold mb-6" style={{ fontFamily: "Inter, sans-serif" }}>

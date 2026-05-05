@@ -128,14 +128,16 @@ html {
 .delay-700 { animation-delay: 700ms; }
 .delay-800 { animation-delay: 800ms; }
 
-/* Initial state for animations */
+/* Scroll-triggered Intersection Observer animation */
 .animate-on-scroll {
   opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.animate-on-scroll.visible {
+.animate-on-scroll.animate-visible {
   opacity: 1;
-  animation: fadeInUp 0.8s ease-out forwards;
+  transform: translateY(0);
 }
 
 /* Soft UI Shadow Utility */
